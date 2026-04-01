@@ -15,7 +15,7 @@ Inspired by [BandoWare/GameplayTags](https://github.com/BandoWare/GameplayTags) 
 ## Installation
 
 ```bash
-npm install gameplay-tags-ts
+npm install git+ssh://git@github.com:wesiqalo/gameplay-tags-ts.git
 ```
 
 ## Quick Start
