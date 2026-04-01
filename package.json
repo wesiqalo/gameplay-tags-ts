@@ -1,0 +1,48 @@
+{
+  "name": "gameplay-tags-ts",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./codegen": {
+      "import": {
+        "types": "./dist/codegen/index.d.ts",
+        "default": "./dist/codegen/index.js"
+      },
+      "require": {
+        "types": "./dist/codegen/index.d.cts",
+        "default": "./dist/codegen/index.cjs"
+      }
+    }
+  },
+  "bin": {
+    "gameplay-tags-codegen": "./dist/bin/gameplay-tags-codegen.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0"
+  }
+}
