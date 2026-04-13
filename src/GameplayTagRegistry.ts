@@ -26,6 +26,7 @@ export class GameplayTagRegistry {
       if (!this.tagToIndex.has(prefix)) {
         const idx = this.insertSorted(prefix);
         this.tagCache.splice(idx, 0, new GameplayTag(idx));
+        this.updateCachedTagIndices(idx + 1);
         this.dirty = true;
       }
     }
@@ -130,13 +131,18 @@ export class GameplayTagRegistry {
     }
     this.tagNames.splice(lo, 0, name);
 
-    // Update indices for all entries at or after the insertion point
+    // Update lookup indices for all entries shifted by the insertion.
     for (let i = lo + 1; i < this.tagNames.length; i++) {
       this.tagToIndex.set(this.tagNames[i], i);
-      this.tagCache[i]._updateIndex(i);
     }
     this.tagToIndex.set(name, lo);
     return lo;
+  }
+
+  private updateCachedTagIndices(startIndex: number): void {
+    for (let i = startIndex; i < this.tagCache.length; i++) {
+      this.tagCache[i]._updateIndex(i);
+    }
   }
 
   /**

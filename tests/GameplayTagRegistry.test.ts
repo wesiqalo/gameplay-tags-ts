@@ -58,6 +58,15 @@ describe("GameplayTagRegistry", () => {
     expect(reg.tagCount).toBe(5); // Ability, Ability.Skill, Ability.Skill.Fire, Status, Status.Burning
   });
 
+  it("keeps cached tags valid when registration happens out of order", () => {
+    const z = reg.registerTag("Z");
+
+    expect(() => reg.registerTag("A")).not.toThrow();
+    expect(z.index).toBe(1);
+    expect(z.name).toBe("Z");
+    expect(reg.getTag("Z")).toBe(z);
+  });
+
   it("isAncestorOf works correctly", () => {
     reg.registerTag("A.B.C");
     reg.registerTag("A.B.D");
