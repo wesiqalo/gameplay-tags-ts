@@ -122,6 +122,14 @@ export class GameplayTagContainer {
     return result;
   }
 
+  static unionAll(...containers: readonly GameplayTagContainer[]): GameplayTagContainer {
+    const result = new GameplayTagContainer();
+    for (const container of containers) {
+      result.indices = mergeUnion(result.indices, container.indices);
+    }
+    return result;
+  }
+
   static difference(
     a: GameplayTagContainer,
     b: GameplayTagContainer,

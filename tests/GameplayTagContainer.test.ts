@@ -194,6 +194,68 @@ describe("GameplayTagContainer", () => {
       expect([...result.tags()].map((t) => t.name)).toEqual(["A"]);
     });
 
+    describe("unionAll", () => {
+      it("returns an empty container for zero arguments", () => {
+        const result = GameplayTagContainer.unionAll();
+        expect(result.isEmpty).toBe(true);
+        expect(result.count).toBe(0);
+      });
+
+      it("returns a copy of a single container", () => {
+        reg.registerTag("A");
+        reg.registerTag("B");
+        const c = GameplayTagContainer.fromTags(reg.getTag("A"), reg.getTag("B"));
+        const result = GameplayTagContainer.unionAll(c);
+        expect([...result.tags()].map((t) => t.name)).toEqual(["A", "B"]);
+      });
+
+      it("merges two containers with deduplication", () => {
+        reg.registerTag("A");
+        reg.registerTag("B");
+        reg.registerTag("C");
+        const c1 = GameplayTagContainer.fromTags(reg.getTag("A"), reg.getTag("B"));
+        const c2 = GameplayTagContainer.fromTags(reg.getTag("B"), reg.getTag("C"));
+        const result = GameplayTagContainer.unionAll(c1, c2);
+        expect([...result.tags()].map((t) => t.name)).toEqual(["A", "B", "C"]);
+      });
+
+      it("merges three containers with deduplication", () => {
+        reg.registerTag("A");
+        reg.registerTag("B");
+        reg.registerTag("C");
+        reg.registerTag("D");
+        const c1 = GameplayTagContainer.fromTags(reg.getTag("A"));
+        const c2 = GameplayTagContainer.fromTags(reg.getTag("B"), reg.getTag("C"));
+        const c3 = GameplayTagContainer.fromTags(reg.getTag("C"), reg.getTag("D"));
+        const result = GameplayTagContainer.unionAll(c1, c2, c3);
+        expect([...result.tags()].map((t) => t.name)).toEqual(["A", "B", "C", "D"]);
+      });
+
+      it("handles empty containers in the mix", () => {
+        reg.registerTag("A");
+        const c = GameplayTagContainer.fromTags(reg.getTag("A"));
+        const empty = new GameplayTagContainer();
+        const result = GameplayTagContainer.unionAll(empty, c, empty);
+        expect([...result.tags()].map((t) => t.name)).toEqual(["A"]);
+      });
+
+      it("is equivalent to pairwise union", () => {
+        reg.registerTag("A");
+        reg.registerTag("B");
+        reg.registerTag("C");
+        const c1 = GameplayTagContainer.fromTags(reg.getTag("A"), reg.getTag("B"));
+        const c2 = GameplayTagContainer.fromTags(reg.getTag("B"), reg.getTag("C"));
+        const pairwise = GameplayTagContainer.union(
+          GameplayTagContainer.union(c1, c2),
+          GameplayTagContainer.fromTags(reg.getTag("A")),
+        );
+        const multi = GameplayTagContainer.unionAll(c1, c2, GameplayTagContainer.fromTags(reg.getTag("A")));
+        expect([...multi.tags()].map((t) => t.name)).toEqual(
+          [...pairwise.tags()].map((t) => t.name),
+        );
+      });
+    });
+
     it("operations on empty containers", () => {
       const empty1 = new GameplayTagContainer();
       const empty2 = new GameplayTagContainer();
