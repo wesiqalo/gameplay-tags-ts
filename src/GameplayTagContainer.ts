@@ -6,6 +6,11 @@ export class GameplayTagContainer {
 
   private indices: number[] = [];
 
+  /** @internal — for GameplayTagContainerCount.fromContainers */
+  _getIndices(): readonly number[] {
+    return this.indices
+  }
+
   addTag(tag: GameplayTag): void {
     if (!tag.isValid) return;
     const idx = tag.index;
