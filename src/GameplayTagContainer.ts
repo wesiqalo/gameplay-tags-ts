@@ -2,6 +2,8 @@ import { GameplayTag } from "./GameplayTag.js";
 import { GameplayTagRegistry } from "./GameplayTagRegistry.js";
 
 export class GameplayTagContainer {
+  static readonly EMPTY = new GameplayTagContainer();
+
   private indices: number[] = [];
 
   addTag(tag: GameplayTag): void {

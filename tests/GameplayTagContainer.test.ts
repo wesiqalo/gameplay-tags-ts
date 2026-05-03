@@ -203,6 +203,68 @@ describe("GameplayTagContainer", () => {
     });
   });
 
+  describe("EMPTY", () => {
+    it("is a shared singleton", () => {
+      expect(GameplayTagContainer.EMPTY).toBe(GameplayTagContainer.EMPTY);
+    });
+
+    it("isEmpty is true", () => {
+      expect(GameplayTagContainer.EMPTY.isEmpty).toBe(true);
+    });
+
+    it("count is 0", () => {
+      expect(GameplayTagContainer.EMPTY.count).toBe(0);
+    });
+
+    it("tags() yields nothing", () => {
+      expect([...GameplayTagContainer.EMPTY.tags()]).toEqual([]);
+    });
+
+    it("hasTag returns false for any tag", () => {
+      const tag = reg.registerTag("A");
+      expect(GameplayTagContainer.EMPTY.hasTag(tag)).toBe(false);
+    });
+
+    it("hasAll against EMPTY is vacuously true", () => {
+      const c = GameplayTagContainer.fromTags(reg.registerTag("A"));
+      expect(c.hasAll(GameplayTagContainer.EMPTY)).toBe(true);
+    });
+
+    it("EMPTY.hasAny against non-empty container is false", () => {
+      reg.registerTag("A");
+      const c = GameplayTagContainer.fromTags(reg.getTag("A"));
+      expect(GameplayTagContainer.EMPTY.hasAny(c)).toBe(false);
+    });
+
+    it("set operations with EMPTY", () => {
+      reg.registerTag("A");
+      const c = GameplayTagContainer.fromTags(reg.getTag("A"));
+
+      expect(
+        GameplayTagContainer.intersection(c, GameplayTagContainer.EMPTY).isEmpty,
+      ).toBe(true);
+      expect(
+        GameplayTagContainer.intersection(GameplayTagContainer.EMPTY, c).isEmpty,
+      ).toBe(true);
+
+      expect(
+        [...GameplayTagContainer.union(c, GameplayTagContainer.EMPTY).tags()].map(
+          (t) => t.name,
+        ),
+      ).toEqual(["A"]);
+
+      expect(
+        [
+          ...GameplayTagContainer.difference(c, GameplayTagContainer.EMPTY).tags(),
+        ].map((t) => t.name),
+      ).toEqual(["A"]);
+
+      expect(
+        GameplayTagContainer.difference(GameplayTagContainer.EMPTY, c).isEmpty,
+      ).toBe(true);
+    });
+  });
+
   describe("fromTags", () => {
     it("creates a container from variadic tags", () => {
       const a = reg.registerTag("A");
