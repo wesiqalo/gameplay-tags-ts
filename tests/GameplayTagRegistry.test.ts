@@ -58,6 +58,71 @@ describe("GameplayTagRegistry", () => {
     expect(reg.tagCount).toBe(5); // Ability, Ability.Skill, Ability.Skill.Fire, Status, Status.Burning
   });
 
+  it("returns direct children in registry order", () => {
+    reg.registerTag("Skill.Production.Crafting.WeaponCrafting");
+    reg.registerTag("Skill.Production.Crafting.AccessoriesCrafting");
+    reg.registerTag("Skill.Production.Crafting.ToolsCrafting");
+    reg.registerTag("Skill.Production.Gathering.Woodcutting");
+
+    expect(
+      reg
+        .getChildren("Skill.Production.Crafting")
+        .map((tag) => tag.name),
+    ).toEqual([
+      "Skill.Production.Crafting.AccessoriesCrafting",
+      "Skill.Production.Crafting.ToolsCrafting",
+      "Skill.Production.Crafting.WeaponCrafting",
+    ]);
+  });
+
+  it("does not include nested descendants as direct children", () => {
+    reg.registerTag("A.B.C");
+    reg.registerTag("A.B.C.D");
+    reg.registerTag("A.B.E");
+
+    expect(reg.getChildren(reg.getTag("A.B")).map((tag) => tag.name)).toEqual([
+      "A.B.C",
+      "A.B.E",
+    ]);
+  });
+
+  it("returns nested descendants with optional self inclusion", () => {
+    reg.registerTag("A.B.C");
+    reg.registerTag("A.B.C.D");
+    reg.registerTag("A.B.E");
+    reg.registerTag("A.F");
+
+    expect(reg.getDescendants("A.B").map((tag) => tag.name)).toEqual([
+      "A.B.C",
+      "A.B.C.D",
+      "A.B.E",
+    ]);
+
+    expect(
+      reg
+        .getDescendants(reg.getTag("A.B"), { includeSelf: true })
+        .map((tag) => tag.name),
+    ).toEqual(["A.B", "A.B.C", "A.B.C.D", "A.B.E"]);
+  });
+
+  it("throws for unknown string inputs when listing children and descendants", () => {
+    expect(() => reg.getChildren("Unknown")).toThrow(
+      'Tag "Unknown" is not registered',
+    );
+    expect(() => reg.getDescendants("Unknown")).toThrow(
+      'Tag "Unknown" is not registered',
+    );
+  });
+
+  it("returns empty lists for NONE", () => {
+    reg.registerTag("A.B");
+
+    expect(reg.getChildren(GameplayTag.NONE)).toEqual([]);
+    expect(
+      reg.getDescendants(GameplayTag.NONE, { includeSelf: true }),
+    ).toEqual([]);
+  });
+
   it("keeps cached tags valid when registration happens out of order", () => {
     const z = reg.registerTag("Z");
 

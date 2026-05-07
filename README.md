@@ -149,6 +149,8 @@ container.hasTag(reg.getTag("Damage")); // true
 | `registerTag(name)` | Register tag + parents, returns `GameplayTag` |
 | `getTag(name)` | Lookup (throws if missing) |
 | `findTag(name)` | Lookup (returns `NONE` if missing) |
+| `getChildren(parent)` | Direct child tags for a registered parent |
+| `getDescendants(parent, options?)` | All nested descendant tags; pass `{ includeSelf: true }` to include the parent |
 | `isRegistered(name)` | Check existence |
 | `tagCount` | Total registered tags |
 | `reset()` | Clear all (for testing) |

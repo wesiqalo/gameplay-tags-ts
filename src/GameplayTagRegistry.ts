@@ -49,6 +49,40 @@ export class GameplayTagRegistry {
     return idx !== undefined ? this.tagCache[idx] : GameplayTag.NONE;
   }
 
+  getChildren(parent: GameplayTag | string): readonly GameplayTag[] {
+    const parentTag = this.resolveTag(parent);
+    if (!parentTag.isValid) {
+      return [];
+    }
+
+    this.ensureFinalized();
+    const children: GameplayTag[] = [];
+    const end = this.descendantRangeEndArr[parentTag.index];
+
+    for (let i = parentTag.index + 1; i < end; i++) {
+      if (this.parentIndexArr[i] === parentTag.index) {
+        children.push(this.tagCache[i]);
+      }
+    }
+
+    return children;
+  }
+
+  getDescendants(
+    parent: GameplayTag | string,
+    options?: { readonly includeSelf?: boolean },
+  ): readonly GameplayTag[] {
+    const parentTag = this.resolveTag(parent);
+    if (!parentTag.isValid) {
+      return [];
+    }
+
+    this.ensureFinalized();
+    const start = options?.includeSelf ? parentTag.index : parentTag.index + 1;
+    const end = this.descendantRangeEndArr[parentTag.index];
+    return this.tagCache.slice(start, end);
+  }
+
   isRegistered(name: string): boolean {
     return this.tagToIndex.has(name);
   }
@@ -112,6 +146,10 @@ export class GameplayTagRegistry {
     if (this.dirty) {
       this.finalize();
     }
+  }
+
+  private resolveTag(tag: GameplayTag | string): GameplayTag {
+    return typeof tag === "string" ? this.getTag(tag) : tag;
   }
 
   /**
